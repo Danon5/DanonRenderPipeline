@@ -7,7 +7,7 @@ namespace DanonRenderPipeline {
         menuName = "Rendering/" + nameof(DanonRenderPipelineAsset))]
     public sealed class DanonRenderPipelineAsset : RenderPipelineAsset {
         protected override RenderPipeline CreatePipeline() {
-            return new DanonRenderPipelineInstance();
+            return new DanonRenderPipelineInstance(this);
         }
     }
 }
