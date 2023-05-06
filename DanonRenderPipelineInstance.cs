@@ -10,6 +10,10 @@ namespace DanonRenderPipeline {
         public DanonRenderPipelineInstance(in DanonRenderPipelineAsset asset) {
             m_asset = asset;
             m_cameraRenderer = new CameraRenderer();
+            
+            if (QualitySettings.activeColorSpace != ColorSpace.Linear)
+                Debug.LogWarning($"The active color space is currently set to {QualitySettings.activeColorSpace}, " +
+                                 "but it should be set to Linear. Rendering might not work properly.");
         }
         
         protected override void Render(ScriptableRenderContext context, Camera[] cameras) {
