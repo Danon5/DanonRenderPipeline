@@ -13,8 +13,15 @@ namespace DanonRenderPipeline {
         }
         
         protected override void Render(ScriptableRenderContext context, Camera[] cameras) {
-            foreach (var camera in cameras)
-                m_cameraRenderer.Render(context, camera);
+            BeginFrameRendering(context, cameras);
+            foreach (var camera in cameras) {
+                m_cameraRenderer.Start(context, camera);
+                BeginCameraRendering(context, camera);
+                m_cameraRenderer.Render();
+                EndCameraRendering(context, camera);
+                m_cameraRenderer.End();
+            }
+            EndFrameRendering(context, cameras);
         }
     }
 }

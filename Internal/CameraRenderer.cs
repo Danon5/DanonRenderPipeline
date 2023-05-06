@@ -39,16 +39,17 @@ namespace DanonRenderPipeline.Internal {
             };
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Render(in ScriptableRenderContext context, in Camera camera) {
+        public void Start(in ScriptableRenderContext context, in Camera camera) {
             m_context = context;
             m_camera = camera;
-
+            
 #if UNITY_EDITOR
             PrepareBuffer();
             PrepareForSceneWindow();
 #endif
-
+        }
+        
+        public void Render() {
             if (!Cull(out var cullingResults)) return;
 
             Setup();
@@ -57,6 +58,9 @@ namespace DanonRenderPipeline.Internal {
             DrawUnsupportedShaders(cullingResults);
             DrawGizmos();
 #endif
+        }
+
+        public void End() {
             Submit();
         }
 
