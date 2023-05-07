@@ -127,6 +127,9 @@ namespace DanonRenderPipeline.Internal {
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DrawGizmos() {
+            if (m_camera.cameraType == CameraType.SceneView)
+                m_context.DrawWireOverlay(m_camera);
+            
             if (Handles.ShouldRenderGizmos()) {
                 m_context.DrawGizmos(m_camera, GizmoSubset.PreImageEffects);
                 m_context.DrawGizmos(m_camera, GizmoSubset.PostImageEffects);
