@@ -49,11 +49,11 @@ namespace DanonRenderPipeline.Internal {
 #endif
         }
         
-        public void Render() {
+        public void Render(bool useDynamicBatching, bool useGPUInstancing) {
             if (!Cull(out var cullingResults)) return;
 
             Setup();
-            DrawVisibleGeometry(cullingResults);
+            DrawVisibleGeometry(cullingResults, useDynamicBatching, useGPUInstancing);
 #if UNITY_EDITOR
             DrawUnsupportedShaders(cullingResults);
             DrawGizmos();
@@ -99,11 +99,14 @@ namespace DanonRenderPipeline.Internal {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void DrawVisibleGeometry(in CullingResults cullingResults) {
+        private void DrawVisibleGeometry(in CullingResults cullingResults, bool useDynamicBatching, bool useGPUInstancing) {
             var sortingSettings = new SortingSettings(m_camera) {
                 criteria = SortingCriteria.CommonOpaque
             };
-            var drawingSettings = new DrawingSettings(s_unlitShaderTagId, sortingSettings);
+            var drawingSettings = new DrawingSettings(s_unlitShaderTagId, sortingSettings) {
+                enableDynamicBatching = useDynamicBatching,
+                enableInstancing = useGPUInstancing
+            };
             var filteringSettings = new FilteringSettings(RenderQueueRange.all);
             m_context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
             m_context.DrawSkybox(m_camera);
