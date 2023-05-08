@@ -29,6 +29,7 @@ namespace DanonRenderPipeline.Internal {
 
         private void SetupDirectionalLight() {
             var light = RenderSettings.sun;
+            if (light == null) return;
             m_buffer.SetGlobalVector(s_dirLightDir, light.transform.forward);
             m_buffer.SetGlobalVector(s_dirLightCol, light.color * light.intensity);
         }
