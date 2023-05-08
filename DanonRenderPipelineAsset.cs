@@ -1,4 +1,7 @@
 ﻿using Sirenix.OdinInspector;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -15,5 +18,14 @@ namespace DanonRenderPipeline {
         protected override RenderPipeline CreatePipeline() {
             return new DanonRenderPipelineInstance(this, m_useDynamicBatching, m_useGPUInstancing, m_useSRPBatcher);
         }
+
+#if UNITY_EDITOR
+        private const string c_material_path = "Assets/Plugins/DanonRenderPipeline/Materials/";
+        private const string c_unlit_path = c_material_path + "DRP-Unlit-Default.mat";
+        
+        public override Material defaultMaterial => AssetDatabase.LoadAssetAtPath<Material>(c_unlit_path);
+        public override Material defaultParticleMaterial => AssetDatabase.LoadAssetAtPath<Material>(c_unlit_path);
+        public override Material defaultLineMaterial => AssetDatabase.LoadAssetAtPath<Material>(c_unlit_path);
+#endif
     }
 }
