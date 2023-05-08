@@ -6,40 +6,44 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace DanonRenderPipeline.Internal {
-    internal sealed class CameraRenderer {
+    internal sealed class DRPCameraRenderer {
         private const string c_buffer_name = "Render Camera";
         private static readonly ShaderTagId s_unlitShaderTagId;
+        private static readonly ShaderTagId s_litShaderTagId;
         private static readonly ShaderTagId[] s_legacyShaderTagIds;
 #if UNITY_EDITOR
         private static readonly Material s_errorMaterial;
 #endif
+        private readonly DRPLighting m_lighting;
         private readonly CommandBuffer m_buffer;
         private ScriptableRenderContext m_context;
         private Camera m_camera;
         private string m_sampleName;
 
-        static CameraRenderer() {
+        static DRPCameraRenderer() {
             s_unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
+            s_litShaderTagId = new ShaderTagId("DRPLit");
             s_legacyShaderTagIds = new ShaderTagId[] {
-                new ShaderTagId("Always"),
-                new ShaderTagId("ForwardBase"),
-                new ShaderTagId("PrepassBase"),
-                new ShaderTagId("Vertex"),
-                new ShaderTagId("VertexLMRGBM"),
-                new ShaderTagId("VertexLM")
+                new("Always"),
+                new("ForwardBase"),
+                new("PrepassBase"),
+                new("Vertex"),
+                new("VertexLMRGBM"),
+                new("VertexLM")
             };
 #if UNITY_EDITOR
             s_errorMaterial = new Material(Shader.Find("Hidden/InternalErrorShader"));
 #endif
         }
 
-        internal CameraRenderer() {
+        internal DRPCameraRenderer() {
+            m_lighting = new DRPLighting();
             m_buffer = new CommandBuffer {
                 name = c_buffer_name
             };
         }
 
-        public void Start(in ScriptableRenderContext context, in Camera camera) {
+        public void Start(ScriptableRenderContext context, in Camera camera) {
             m_context = context;
             m_camera = camera;
             
@@ -53,6 +57,7 @@ namespace DanonRenderPipeline.Internal {
             if (!Cull(out var cullingResults)) return;
 
             Setup();
+            m_lighting.Setup(m_context);
             DrawVisibleGeometry(cullingResults, useDynamicBatching, useGPUInstancing);
 #if UNITY_EDITOR
             DrawUnsupportedShaders(cullingResults);
@@ -107,6 +112,7 @@ namespace DanonRenderPipeline.Internal {
                 enableDynamicBatching = useDynamicBatching,
                 enableInstancing = useGPUInstancing
             };
+            drawingSettings.SetShaderPassName(1, s_litShaderTagId);
             var filteringSettings = new FilteringSettings(RenderQueueRange.all);
             m_context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
             m_context.DrawSkybox(m_camera);

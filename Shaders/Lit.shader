@@ -1,4 +1,4 @@
-Shader "DRP/Unlit"
+Shader "DRP/Lit"
 {
     Properties
     {
@@ -14,6 +14,8 @@ Shader "DRP/Unlit"
     {
         Pass
         {
+            Tags { "LightMode" = "DRPLit" }
+            
             Blend [_SrcBlend] [_DstBlend]
 			ZWrite [_ZWrite]
             
@@ -22,7 +24,7 @@ Shader "DRP/Unlit"
             #pragma shader_feature _CLIPPING
             #pragma vertex Vert
             #pragma fragment Frag
-            #include "UnlitPass.hlsl"
+            #include "LitPass.hlsl"
             ENDHLSL
         }
     }

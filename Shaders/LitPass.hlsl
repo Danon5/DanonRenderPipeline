@@ -2,15 +2,18 @@
 #define DRP_UNLIT_PASS_INCLUDED
 
 #include "Assets/Plugins/DanonRenderPipeline/ShaderLibrary/Common.hlsl"
+#include "Assets/Plugins/DanonRenderPipeline/ShaderLibrary/Lighting.hlsl"
 
 struct Attributes {
     float3 posOS : POSITION;
+    float3 nOS : NORMAL;
     float2 uv0 : TEXCOORD0;
     UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
 struct VertToFrag {
     float4 posCS : SV_POSITION;
+    float3 nWS : VAR_NORMAL;
     float2 uv0 : TEXCOORD0;
     UNITY_VERTEX_INPUT_INSTANCE_ID
 };
@@ -30,6 +33,7 @@ VertToFrag Vert(Attributes input) {
     UNITY_TRANSFER_INSTANCE_ID(input, output);
     float3 posWS = TransformObjectToWorld(input.posOS);
     output.posCS = TransformWorldToHClip(posWS);
+    output.nWS = TransformObjectToWorldNormal(input.nOS);
     float4 st = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _MainTex_ST);
     output.uv0 = input.uv0 * st.xy + st.zw;
     return output;
@@ -43,6 +47,13 @@ float4 Frag(VertToFrag input) : SV_TARGET {
     #ifdef _CLIPPING
     clip(col.a - UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _Cutoff));
     #endif
+
+    Surface surf;
+    surf.n = normalize(input.nWS);
+    surf.col = col;
+
+    col.xyz = CalcLighting(surf);
+    
     return col;
 }
 
