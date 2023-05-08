@@ -21,9 +21,10 @@ namespace DanonRenderPipeline {
 
 #if UNITY_EDITOR
         private const string c_material_path = "Assets/Plugins/DanonRenderPipeline/Materials/";
+        private const string c_lit_path = c_material_path + "DRP-Lit-Default.mat";
         private const string c_unlit_path = c_material_path + "DRP-Unlit-Default.mat";
-        
-        public override Material defaultMaterial => AssetDatabase.LoadAssetAtPath<Material>(c_unlit_path);
+
+        public override Material defaultMaterial => AssetDatabase.LoadAssetAtPath<Material>(c_lit_path);
         public override Material defaultParticleMaterial => AssetDatabase.LoadAssetAtPath<Material>(c_unlit_path);
         public override Material defaultLineMaterial => AssetDatabase.LoadAssetAtPath<Material>(c_unlit_path);
 #endif
